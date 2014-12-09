@@ -19,7 +19,12 @@
 #
 ##############################################################################
 
+from functools import partial
 import time
+
+from reportlab.lib import units
+from reportlab.pdfbase.pdfmetrics import getFont
+
 from openerp.report import report_sxw
 
 
@@ -31,7 +36,39 @@ class report_print_check(report_sxw.rml_parse):
         self.localcontext.update({
             'time': time,
             'get_all_lines': self.get_all_lines,
+            'fill': self.fill_to_size,
         })
+
+    def fill_to_size(self, s, fillsize, filling=u"*", filldir="left",
+                     fontsize=10.0, font="Helvetica", padding=15):
+        """ Fill a string up to a certain size with a fill character
+        Params:
+        - s: string to fill
+        - fillsize: size as string with unit (mm/pt/inch/px)
+        - filling: fill character
+        - filldir: left/right/center, fill direction
+        - fontsize: font size for size calculation
+        - font: font name
+        - padding: padding to be sure not to overflow
+        """
+        font = getFont(font)
+        size = units.toLength(fillsize)
+        maxsize = size - padding
+        pad = partial(u"{0:{pad}{dir}{1}}".format, s,
+                      pad=filling,
+                      dir={"left": u">", "right":u"<", "center":u"^"}.get(
+                          filldir, ""),
+                     )
+
+        # No use padding if it won't fit
+        padlen = 0
+        while font.stringWidth(pad(padlen), fontsize) < maxsize:
+            padlen += 1
+
+        print font.stringWidth(pad(padlen), fontsize)
+        print font.stringWidth(s, fontsize)
+        print s
+        return pad(padlen)
 
     def get_all_lines(self, voucher):
         debit_lines = voucher.line_dr_ids

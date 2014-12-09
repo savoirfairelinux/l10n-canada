@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <document filename="test.pdf">
-  <template pageSize="(216mm,279mm)" title="Fruigor Check" author="Savoir-faire Linux" allowSplitting="0">
+  <template pageSize="(216mm,279mm)" title="Fruigor Check" author="Savoir-faire Linux" allowSplitting="">
     <pageTemplate id="first">
       <frame id="CheckAddress"    x1="22mm"     y1="206mm"    width="145mm"   height="32mm"/>
       <frame id="CheckSumLetter"  x1="12mm"     y1="240mm"    width="155mm"   height="12mm"/>
@@ -21,12 +21,16 @@
       <blockSpan start="0,-1" stop="4,-1" />
     </blockTableStyle>
     <initialize>
-      <paraStyle name="all" fontName="Helvetica" alignment="LEFT"/>
+      <paraStyle name="all" fontName="Helvetica"
+        alignment="LEFT" spaceBefore="0mm" spaceAfter="0mm"
+        leftIndent="0mm" rightIndent="0mm" firstLineIndent="0mm"
+        />
     </initialize>
     <paraStyle name="P8" fontSize="8.0" leading="10"/>
-    <paraStyle name="P9" fontSize="10.0" leading="12"/>
-    <paraStyle name="P9-R" fontSize="10.0" leading="12"/>
+    <paraStyle name="P9" fontSize="9.0" leading="11"/>
+    <paraStyle name="P9-R" fontSize="9.0" leading="11" alignment="RIGHT"/>
     <paraStyle name="P10" fontSize="10.0" leading="12"/>
+    <paraStyle name="P10-R" fontSize="10.0" leading="10" alignment="RIGHT"/>
     <paraStyle name="P8B" fontSize="8.0" fontName="Helvetica-Bold" leading="10" />
     <paraStyle name="P8B-R" fontSize="8.0" fontName="Helvetica-Bold" leading="10" alignment="RIGHT"/>
     <images/>
@@ -36,35 +40,30 @@
     <para>[[ setLang(voucher.partner_id.lang) ]]</para>
 
     <!-- Check Address -->
+    <currentFrame name="CheckAddress" />
     <para style="P8">[[ voucher.partner_id.name ]]</para>
     <para style="P8">[[ display_address(voucher.partner_id) or removeParentNode('para') ]]</para>
 
-    <setNextFrame name="CheckDate" />
-    <frameEnd />
+    <currentFrame name="CheckDate" />
     <!-- Check Date -->
     <para style="P10">[[ formatLang(voucher.date, date=True) or '' ]]</para>
 
-    <setNextFrame name="CheckDateLabel" />
-    <frameEnd />
+    <currentFrame name="CheckDateLabel" />
     <!-- Check Date Label -->
     <para style="P9-R">DATE</para>
 
-    <setNextFrame name="CheckSumDigit" />
-    <frameEnd />
+    <currentFrame name="CheckSumLetter" />
+    <!-- Check Sum Letter -->
+    <para style="P10-R">[[ fill(voucher.amount_in_word.strip("*").strip(), "150mm") ]]</para>
+
+    <currentFrame name="CheckSumDigit" />
     <!-- Check Sum Digit -->
     <para style="P10">[[ formatLang(voucher.amount) ]]</para>
 
-    <setNextFrame name="CheckSumLetter" />
-    <frameEnd />
-    <!-- Check Sum Letter -->
-    <para style="P9-R">[[ voucher.amount_in_word ]]</para>
-
-    <setNextFrame name="MemoLabel" />
-    <frameEnd />
+    <currentFrame name="MemoLabel" />
     <para style="P8">MEMO [[ voucher.name ]]</para>
 
-    <setNextFrame name="Stub1" />
-    <frameEnd />
+    <currentFrame name="Stub1" />
     <!-- Stub One -->
     <blockTable colWidths="27mm,56mm,28mm,28mm,26mm,26mm" style="TStub">
       <!-- Stub Header -->
@@ -114,8 +113,7 @@
       </tr>
     </blockTable>
 
-    <setNextFrame name="Stub2" />
-    <frameEnd />
+    <currentFrame name="Stub2" />
     <!-- Stub Two -->
     <blockTable colWidths="27mm,56mm,28mm,28mm,26mm,26mm" style="TStub">
       <!-- Stub Header -->
